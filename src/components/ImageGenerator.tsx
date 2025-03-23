@@ -18,7 +18,7 @@ export default function ImageGenerator() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/replicate/generate-image", {
+      const response = await fetch("/api/replicate", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -29,7 +29,7 @@ export default function ImageGenerator() {
       const data = await response.json();
 
       if (response.ok && data.output) {
-        setImageUrl(data.output[0]);
+        setImageUrl(data.output);
       } else {
         setError(data.error || "Failed to generate image");
       }

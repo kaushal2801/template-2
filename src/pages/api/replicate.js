@@ -1,16 +1,20 @@
-import { NextRequest, NextResponse } from "next/server";
 import Replicate from "replicate";
 
 const replicate = new Replicate({
-  auth: process.env.REPLICATE_API_TOKEN, // Use environment variable
+  auth: process.env.REPLICATE_API_TOKEN,
 });
 
-export async function POST(req: NextRequest) {
+export default async function handler(req, res) {
+  // Only allow POST requests
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
   try {
-    const { prompt } = await req.json();
+    const { prompt } = req.body;
 
     if (!prompt) {
-      return NextResponse.json({ error: "Prompt is required" }, { status: 400 });
+      return res.status(400).json({ error: 'Prompt is required' });
     }
 
     const output = await replicate.run("black-forest-labs/flux-schnell", {
@@ -24,9 +28,9 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    return NextResponse.json({ output });
+    return res.status(200).json({ output });
   } catch (error) {
     console.error("Error generating image:", error);
-    return NextResponse.json({ error: "Failed to generate image" }, { status: 500 });
+    return res.status(500).json({ error: "Failed to generate image" });
   }
 } 
